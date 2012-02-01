@@ -3,10 +3,10 @@ testrunner
 Syntax: testrunner [options]
 
 Options:
- -c <file>        runlist name                      example -c conf/py-all.conf
- -t <test>        test case                         example : -t setgettests.MembaseBucket.value_100b
- -i <file>        resource file                     example : -i resources/jenkins/single-node-centos-32.ini
- -p key=value     key,value pairs                   example : version=xyz,key1=value1 : example  : -p version=1.7.0,amazon=true
+ -c <file>        runlist name      example -c conf/py-all.conf
+ -t <test>        test case         example : -t setgettests.MembaseBucket.value_100b
+ -i <file>        resource file     example : -i resources/jenkins/single-node-centos-32.ini
+ -p key=value     key,value pairs   example : version=xyz,key1=value1 : example  : -p version=1.7.0,amazon=true
 
 
 Requirements:
@@ -29,8 +29,9 @@ Requirements:
 ---
 >                 self.__add_compiler_option("-xO3")
 
- while paramiko and pycrypto both support pypi package
- installation i still recommend downloading and installing these two modules manually.
+ while paramiko and pycrypto both support pypi package installation i
+ still recommend downloading and installing these two modules
+ manually.
 
  wget http://ftp.dlitz.net/pub/dlitz/crypto/pycrypto/pycrypto-2.3.tar.gz
  tar -xvf pycrypto-2.3.tar.gz
@@ -47,9 +48,11 @@ Requirements:
 
 Resource File:
 
-Ini files represents the ns_server information which is accessible to the tests.
+Ini files represents the ns_server information which is accessible to
+the tests.
 
-[global] section defines the rest username,password that tests use to login to ns_server
+[global] section defines the rest username,password that tests use to
+login to ns_server
 
 Example:
 
@@ -61,10 +64,11 @@ password:membase
 rest_username:Administrator
 rest_password:asdasd
 
-[servers] section lists port and ssh related information. ssh connection information
-is required for small subset of tests where test needs to perform installation,backup or restore.
-If ns_server instances are started using ns_server/cluster_run script then you only need to define ip and port
-for those nodes.
+[servers] section lists port and ssh related information. ssh
+connection information is required for small subset of tests where
+test needs to perform installation,backup or restore.  If ns_server
+instances are started using ns_server/cluster_run script then you only
+need to define ip and port for those nodes.
 
 Example:
 
@@ -92,7 +96,8 @@ port:9003
 
 Test Execution and Reporting:
 
-For every test run testrunner creates a temp folder and dumps the logs and xunit reports in the newly generated folder.
+For every test run testrunner creates a temp folder and dumps the logs
+and xunit reports in the newly generated folder.
 
 for instance if you run
 ./testrunner -i resources/jenkins/single-node-centos-32.ini -t setgettests.MembaseBucket.value_100b
@@ -108,9 +113,9 @@ report-12-11-47.xml-setgettests.MembaseBucket.xml	value_100b.log
 Development:
 
 When using git on Linux/OSX systems, you might run into issues where
-git incorrectly believes Windows-related files have been modified.
-In reality, git is merely mis-treating CRLF line endings.
-Try the following...
+git incorrectly believes Windows-related files have been modified.  In
+reality, git is merely mis-treating CRLF line endings.  Try the
+following...
 
     cd testrunner
     git config core.autocrlf false
