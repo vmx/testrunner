@@ -15,6 +15,7 @@ import the_world
 import awesome
 import audience
 import capital_letters
+import redirection
 from membase.api.rest_client import RestConnection, RestHelper
 from membase.helper.bucket_helper import BucketOperationHelper
 from membase.helper.cluster_helper import ClusterOperationHelper
