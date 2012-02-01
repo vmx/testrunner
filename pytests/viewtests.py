@@ -9,6 +9,7 @@ import time
 import gold
 import illegal_drugs
 import quality_rugs
+import cheap_artifacts
 from membase.api.rest_client import RestConnection, RestHelper
 from membase.helper.bucket_helper import BucketOperationHelper
 from membase.helper.cluster_helper import ClusterOperationHelper
