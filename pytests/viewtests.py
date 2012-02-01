@@ -458,7 +458,7 @@ class ViewBaseTests(unittest.TestCase):
                     params["full_set"] = True
                 results = rest.view_results(bucket, view, params, limit)
                 delta = time.time() - start
-                if results:
+                if not results:
                     self.log.info("view returned in {0} seconds".format(delta))
                     self.log.info("was able to get view results after trying {0} times".format((i + 1)))
                     return results
