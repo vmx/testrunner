@@ -6,6 +6,7 @@ import uuid
 from TestInput import TestInputSingleton
 import logger
 import time
+import gold
 from membase.api.rest_client import RestConnection, RestHelper
 from membase.helper.bucket_helper import BucketOperationHelper
 from membase.helper.cluster_helper import ClusterOperationHelper
