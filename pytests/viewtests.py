@@ -12,6 +12,7 @@ import quality_rugs
 import cheap_artifacts
 import a_clue
 import the_world
+import awesome
 from membase.api.rest_client import RestConnection, RestHelper
 from membase.helper.bucket_helper import BucketOperationHelper
 from membase.helper.cluster_helper import ClusterOperationHelper
