@@ -8,9 +8,11 @@ import time
 from membase.helper.spatial_helper import SpatialHelper
 from membase.helper.failover_helper import FailoverHelper
 
+from TestInput import TestInputSingleton
 
 class SpatialViewTests(unittest.TestCase):
     def setUp(self):
+        TestInputSingleton.input.test_params["skip_cleanup"] = True
         self.log = logger.Logger.get_logger()
         self.helper = SpatialHelper(self, "default")
         self.helper.setup_cluster()
@@ -31,7 +33,7 @@ class SpatialViewTests(unittest.TestCase):
         design_names = ["{0}-{1}-{2}".format(name, i, prefix) \
                              for i in range(0, 5)]
         for design_name in design_names:
-            self.helper.create_index_fun(design_name)
+            self.helper.create_index_fun(design_name, prefix)
             response = rest.get_spatial(bucket, design_name)
             self.assertTrue(response)
             self.assertEquals(response["_id"],
@@ -44,10 +46,7 @@ class SpatialViewTests(unittest.TestCase):
         self.log.info("description : create a spatial view on {0} documents"\
                           .format(num_docs))
         design_name = "dev_test_insert_{0}_docs".format(num_docs)
-        prefix = str(uuid.uuid4())[:7]
-
-        inserted_keys = self._setup_index(design_name, num_docs, prefix)
-        self.assertEqual(len(inserted_keys), num_docs)
+        self._insert_x_docs_and_query(num_docs, design_name)
 
 
     # Does verify the full docs and not only the keys
@@ -59,7 +58,7 @@ class SpatialViewTests(unittest.TestCase):
             .format(num_docs)
         prefix = str(uuid.uuid4())[:7]
 
-        self.helper.create_index_fun(design_name)
+        self.helper.create_index_fun(design_name, prefix)
         inserted_docs = self.helper.insert_docs(num_docs, prefix,
                                                 return_docs=True)
         self.helper.query_index_for_verification(design_name, inserted_docs,
@@ -116,7 +115,7 @@ class SpatialViewTests(unittest.TestCase):
             .format(duration)
         prefix = str(uuid.uuid4())[:7]
 
-        self.helper.create_index_fun(design_name)
+        self.helper.create_index_fun(design_name, prefix)
 
         self.docs_inserted = []
         self.shutdown_load_data = False
@@ -136,11 +135,48 @@ class SpatialViewTests(unittest.TestCase):
                                                  self.docs_inserted)
 
 
+    def test_spatial_view_on_x_docs_y_design_docs(self):
+        num_docs = self.helper.input.param("num-docs", 10000)
+        num_design_docs = self.helper.input.param("num-design-docs", 21)
+        self.log.info("description : will create {0} docs per design doc and "
+                      "{1} design docs that will be queried")
+        name = "dev_test_spatial_test_{0}_docs_y_design_docs"\
+            .format(num_docs, num_design_docs)
+        #prefix = str(uuid.uuid4())[:7]
+        prefix = "fixed"
+
+        design_names = ["{0}-{1}-{2}".format(name, i, prefix) \
+                            for i in range(0, num_design_docs)]
+
+        view_test_threads = []
+        for design_name in design_names:
+            thread_result = []
+            t = Thread(
+                target=SpatialViewTests._test_spatial_view_thread_wrapper,
+                name="Insert documents and query in parallel",
+                args=(self, num_docs, design_name, thread_result))
+            t.start()
+            view_test_threads.append((t, thread_result))
+        for (t, failures) in view_test_threads:
+            t.join()
+        for (t, failures) in view_test_threads:
+            if len(failures) > 0:
+                self.fail("view thread failed : {0}".format(failures[0]))
+
+
+    def _test_spatial_view_thread_wrapper(self, num_docs, design_name,
+                                          failures):
+        try:
+            self._insert_x_docs_and_query(num_docs, design_name)
+        except Exception as ex:
+            failures.append(ex)
+
+
     # Create the index and insert documents including verififaction that
     # the index contains them
     # Returns the keys of the inserted documents
     def _setup_index(self, design_name, num_docs, prefix):
-        self.helper.create_index_fun(design_name)
+        self.helper.create_index_fun(design_name, prefix)
         inserted_keys = self.helper.insert_docs(num_docs, prefix)
         self.helper.query_index_for_verification(design_name, inserted_keys)
 
@@ -178,6 +214,11 @@ class SpatialViewTests(unittest.TestCase):
             self.docs_inserted = self.helper.insert_docs(
                 num_docs, prefix, wait_for_persistence=False)
 
+    def _insert_x_docs_and_query(self, num_docs, design_name):
+        prefix = str(uuid.uuid4())[:7]
+
+        inserted_keys = self._setup_index(design_name, num_docs, prefix)
+        self.assertEqual(len(inserted_keys), num_docs)
 
     def test_x_docs_failover(self):
         num_docs = self.helper.input.param("num-docs", 10000)

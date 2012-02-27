@@ -64,8 +64,9 @@ class SpatialHelper:
                 self.servers, self.testcase)
 
 
-    def create_index_fun(self, name):
-        fun = "function (doc) {emit(doc.geometry, doc);}"
+    def create_index_fun(self, name, prefix):
+        fun = 'function (doc) {if(doc._id.indexOf("' + prefix + \
+            '") != -1) { emit(doc.geometry, doc);}}'
         function = self._create_function(name, fun)
         self.rest.create_spatial(self.bucket, name, function)
         self._indexes.append(name)
@@ -139,7 +140,7 @@ class SpatialHelper:
         return doc_names
 
 
-    def get_results(self, spatial, limit=100, extra_params={}):
+    def get_results(self, spatial, limit=None, extra_params={}):
         for i in range(0, 4):
             try:
                 start = time.time()
@@ -243,6 +244,7 @@ class SpatialHelper:
     # will be verified
     def query_index_for_verification(self, design_name, inserted,
                                      full_docs=False):
+        self.wait_for_persistence()
         attempt = 0
         delay = 10
         limit = len(inserted)
