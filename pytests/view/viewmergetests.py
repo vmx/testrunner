@@ -272,11 +272,13 @@ class ViewMergingTests(BaseTestCase):
         # A development view is always a subset of the production view,
         # hence only check for that (and not the exact items)
         expected = self.calculate_matching_keys({})
+        self.assertTrue(self.input.param("num_docs_per_vbucket", 1) > 20,
+                        "The count of docs per vbucket is too low for this test")
         self.assertTrue(len(results.get(u'rows', [])) < len(expected) and
                         len(results.get(u'rows', [])) > 0,
-                          ("Rows number is wrong, expected to be lower than "
-                           "%d and >0, but it was %d"
-                          % (len(expected), len(results.get(u'rows', [])))))
+                        ("Rows number is wrong, expected to be lower than "
+                         "%d and >0, but it was %d"
+                         % (len(expected), len(results.get(u'rows', [])))))
         self.assertTrue(
             results.get(u'rows', [])[0]['key'] != expected[0] or
             results.get(u'rows', [])[-1]['key'] != expected[-1],
