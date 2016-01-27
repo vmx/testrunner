@@ -473,12 +473,15 @@ class RestConnection(object):
                                                   urllib.urlencode(query))
         log.info("index query url: {0}".format(api))
         if isinstance(bucket, Bucket) and bucket.authType == "sasl":
+            log.info("vmx: rest_client: _query: sasl: headers: {}".format(self._create_capi_headers_with_auth(username=bucket.name, password=bucket.saslPassword)))
             status, content, header = self._http_request(api, headers=self._create_capi_headers_with_auth(
                                                 username=bucket.name, password=bucket.saslPassword),
                                                 timeout=timeout)
         else:
+            log.info("vmx: rest_client: _query: no sasl: headers {}".format(self._create_capi_headers()))
             status, content, header = self._http_request(api, headers=self._create_capi_headers(),
                                              timeout=timeout)
+        log.info("vmx: rest_client: _query: content: {}".format(content))
         return status, content, header
 
     def view_results(self, bucket, ddoc_name, params, limit=100, timeout=120,

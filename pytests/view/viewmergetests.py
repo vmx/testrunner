@@ -274,6 +274,11 @@ class ViewMergingTests(BaseTestCase):
         expected = self.calculate_matching_keys({})
         self.assertTrue(self.input.param("num_docs_per_vbucket", 1) > 20,
                         "The count of docs per vbucket is too low for this test")
+        if len(results.get(u'rows', [])) >= len(expected):
+            self.log.info("vmx: expected: {}".format(expected))
+            self.log.info("vmx: results: {}".format(results))
+            self.log.info("vmx: sleeping for 300s in order to be able to query the view")
+            time.sleep(300)
         self.assertTrue(len(results.get(u'rows', [])) < len(expected) and
                         len(results.get(u'rows', [])) > 0,
                         ("Rows number is wrong, expected to be lower than "
